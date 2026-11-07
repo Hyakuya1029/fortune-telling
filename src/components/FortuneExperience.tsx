@@ -174,19 +174,21 @@ export function FortuneExperience({
 
     setIsSharing(true);
     const shareUrl = `${window.location.origin}/`;
-    const text = buildShareText(fortune, dateLabel, shareUrl);
+    const shareText = buildShareText(fortune, dateLabel, shareUrl);
+    const shareBody = buildShareText(fortune, dateLabel, "").trimEnd();
 
     try {
       if (navigator.share) {
         await navigator.share({
           title: "星签 · 每日一签",
-          text,
+          text: shareBody,
           url: shareUrl,
         });
+        showToast("今日签文已分享");
         return;
       }
 
-      await copyWithFallback(text);
+      await copyWithFallback(shareText);
       showToast("今日签文已复制");
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") {
@@ -194,7 +196,7 @@ export function FortuneExperience({
       }
 
       try {
-        await copyWithFallback(text);
+        await copyWithFallback(shareText);
         showToast("今日签文已复制");
       } catch {
         showToast("复制失败，请手动选择文字");
@@ -205,10 +207,10 @@ export function FortuneExperience({
   };
 
   const hint = isRevealed
-    ? "今日签已落定 · 明日再来"
+    ? "今日签已落定 · 可重读解签"
     : isDrawing
       ? "签筒轻响 · 正在为你起签"
-      : "轻触卡面 · 抽取今日签";
+      : "每日一签 · 只此一次";
 
   return (
     <>
@@ -237,7 +239,10 @@ export function FortuneExperience({
             </p>
 
             <div className="hero-actions">
-              <a href="#ritual" className="btn btn--primary">
+              <a
+                href={isRevealed ? "#reading" : "#ritual"}
+                className="btn btn--primary"
+              >
                 {isRevealed ? "查看今日签" : "抽取今日签"}
                 <span aria-hidden="true">↘</span>
               </a>
@@ -337,16 +342,12 @@ export function FortuneExperience({
                 aria-hidden="true"
               />
 
-              <button
-                type="button"
+              <div
                 className={`fortune-card${isDrawing ? " is-drawing" : ""}${
                   isRevealed ? " is-revealed" : ""
                 }`}
                 onClick={handleDraw}
-                aria-busy={isDrawing}
-                aria-label={
-                  isRevealed ? "查看今日签文" : "抽取今日签"
-                }
+                aria-hidden="true"
               >
                 <span className="card-inner">
                   <span
@@ -462,6 +463,23 @@ export function FortuneExperience({
                     </span>
                   </span>
                 </span>
+              </div>
+
+              <button
+                type="button"
+                className="btn btn--primary draw-button"
+                onClick={handleDraw}
+                disabled={isDrawing}
+                aria-busy={isDrawing}
+              >
+                <span>
+                  {isRevealed
+                    ? "查看今日解签"
+                    : isDrawing
+                      ? "正在起签…"
+                      : "抽取今日签"}
+                </span>
+                <span aria-hidden="true">{isRevealed ? "↓" : "↘"}</span>
               </button>
 
               <p className="card-hint" aria-live="polite">
@@ -648,12 +666,12 @@ export function FortuneExperience({
                 <div>
                   <span>01</span>
                   <h3>每日一次</h3>
-                  <p>克制，是仪式的一部分。今天抽过，就等明天。</p>
+                  <p>克制，是仪式的一部分。</p>
                 </div>
                 <div>
                   <span>02</span>
                   <h3>不收集身份</h3>
-                  <p>无需登录。今日签只保存在你的浏览器里。</p>
+                  <p>无需登录，签文只留在你的浏览器。</p>
                 </div>
                 <div>
                   <span>03</span>

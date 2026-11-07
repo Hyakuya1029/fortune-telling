@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
 import {
   FORTUNE_LEVELS,
@@ -19,6 +19,7 @@ const FILTERS: Filter[] = ["全部", ...FORTUNE_LEVELS];
 export function FortuneArchive({ fortunes }: FortuneArchiveProps) {
   const [filter, setFilter] = useState<Filter>("全部");
   const [openId, setOpenId] = useState<number | null>(null);
+  const hasMounted = useRef(false);
 
   const visibleFortunes = useMemo(
     () =>
@@ -27,6 +28,25 @@ export function FortuneArchive({ fortunes }: FortuneArchiveProps) {
         : fortunes.filter((fortune) => fortune.level === filter),
     [filter, fortunes],
   );
+
+  useEffect(() => {
+    if (!hasMounted.current) {
+      hasMounted.current = true;
+      return;
+    }
+
+    const grid = document.getElementById("archive-grid");
+    if (!grid) return;
+
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    grid.scrollIntoView({
+      behavior: reducedMotion ? "auto" : "smooth",
+      block: "start",
+    });
+  }, [filter]);
 
   const countFor = (item: Filter) =>
     item === "全部"
@@ -55,7 +75,7 @@ export function FortuneArchive({ fortunes }: FortuneArchiveProps) {
         </p>
       </div>
 
-      <div className="archive-grid">
+      <div id="archive-grid" className="archive-grid">
         {visibleFortunes.map((fortune) => {
           const isOpen = openId === fortune.id;
           const bodyId = `fortune-body-${fortune.id}`;
@@ -97,13 +117,21 @@ export function FortuneArchive({ fortunes }: FortuneArchiveProps) {
                     <i aria-hidden="true" />
                     {fortune.keyword}
                   </span>
-                  <span>{isOpen ? "收起 −" : "展开 +"}</span>
+                  <span className="archive-card-toggle">
+                    <span>{isOpen ? "收起解签" : "展开解签"}</span>
+                    <i className="archive-card-toggle-icon" aria-hidden="true">
+                      {isOpen ? "−" : "+"}
+                    </i>
+                  </span>
                 </span>
               </button>
 
               {isOpen ? (
                 <div id={bodyId} className="archive-card-body">
                   <div className="archive-body-copy">
+                    <p className="archive-body-kicker">
+                      SIGN NOTES · {formatFortuneNumber(fortune.id)}
+                    </p>
                     <p>{fortune.interpretation}</p>
                     <blockquote>{fortune.guidance}</blockquote>
                   </div>

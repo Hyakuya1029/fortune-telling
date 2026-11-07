@@ -37,7 +37,7 @@ export default function FortunesPage() {
             </p>
             <h1>
               三十六签，
-              <br />
+              <br className="archive-title-break" />
               <em>每一种今天。</em>
             </h1>
             <p className="archive-lead">
