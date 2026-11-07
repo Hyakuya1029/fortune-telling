@@ -14,7 +14,7 @@ import {
 type DrawStatus = "idle" | "drawing" | "revealed";
 
 interface FortuneExperienceProps {
-  fortune: Fortune;
+  fortunes: Fortune[];
   dateKey: string;
   dateLabel: string;
   shortDate: {
@@ -51,11 +51,12 @@ function copyWithFallback(text: string) {
 }
 
 export function FortuneExperience({
-  fortune,
+  fortunes,
   dateKey,
   dateLabel,
   shortDate,
 }: FortuneExperienceProps) {
+  const [fortune, setFortune] = useState<Fortune>(fortunes[0]);
   const [status, setStatus] = useState<DrawStatus>("idle");
   const [toast, setToast] = useState("");
   const [isSharing, setIsSharing] = useState(false);
@@ -73,13 +74,15 @@ export function FortuneExperience({
       if (!stored) return;
 
       const parsed = JSON.parse(stored) as StoredDraw;
-      if (parsed.id === fortune.id) {
+      const saved = fortunes.find((item) => item.id === parsed.id);
+      if (saved) {
+        setFortune(saved);
         setStatus("revealed");
       }
     } catch {
       // A blocked localStorage should never stop the reading from working.
     }
-  }, [dateKey, fortune.id]);
+  }, [dateKey, fortunes]);
 
   useEffect(() => {
     return () => {
@@ -136,6 +139,9 @@ export function FortuneExperience({
       return;
     }
 
+    const nextFortune =
+      fortunes[Math.floor(Math.random() * fortunes.length)];
+    setFortune(nextFortune);
     setStatus("drawing");
     setToast("");
 
@@ -156,7 +162,7 @@ export function FortuneExperience({
           window.localStorage.setItem(
             getDrawStorageKey(dateKey),
             JSON.stringify({
-              id: fortune.id,
+              id: nextFortune.id,
               dateKey,
               drawnAt: new Date().toISOString(),
             }),
@@ -310,7 +316,7 @@ export function FortuneExperience({
                   <span className="step-number">02</span>
                   <div>
                     <h3>抽签</h3>
-                    <p>轻触卡面。今日的签由日期决定，不重复抽取。</p>
+                    <p>轻触卡面。今天只抽一次，签文会留在浏览器里。</p>
                   </div>
                 </li>
                 <li>

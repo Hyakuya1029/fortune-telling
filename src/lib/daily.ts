@@ -1,4 +1,4 @@
-import { FORTUNES, type Fortune, type FortuneLevel } from "@/data/fortunes";
+import type { Fortune, FortuneLevel } from "@/data/fortunes";
 
 export const FORTUNE_TIME_ZONE = "Asia/Shanghai";
 export const FORTUNE_LEVELS: FortuneLevel[] = [
@@ -45,21 +45,6 @@ export function getDateKey(date = new Date()): string {
   return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
 
-export function getDailyFortuneIndex(date = new Date()): number {
-  const { year, month, day } = getDateParts(date);
-  const epochDay = Math.floor(Date.UTC(year, month - 1, day) / 86_400_000);
-  const index = (epochDay * 17 + 11) % FORTUNES.length;
-  return ((index % FORTUNES.length) + FORTUNES.length) % FORTUNES.length;
-}
-
-export function getDailyFortune(date = new Date()): Fortune {
-  return FORTUNES[getDailyFortuneIndex(date)];
-}
-
-export function getFortuneById(id: number): Fortune | undefined {
-  return FORTUNES.find((fortune) => fortune.id === id);
-}
-
 export function getDateLabel(date = new Date()): string {
   const { year, month, day, weekday } = getDateParts(date);
   return `${year}年${month}月${day}日 · ${weekday}`;
@@ -88,7 +73,7 @@ export function formatFortuneNumber(id: number): string {
 }
 
 export function getDrawStorageKey(dateKey: string): string {
-  return `stellar-oracle:draw:${dateKey}`;
+  return `stellar-oracle:draw:v2:${dateKey}`;
 }
 
 export function buildShareText(

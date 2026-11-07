@@ -4,12 +4,8 @@ import { FortuneExperience } from "@/components/FortuneExperience";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { StarField } from "@/components/StarField";
-import {
-  getDailyFortune,
-  getDateKey,
-  getDateLabel,
-  getShortDate,
-} from "@/lib/daily";
+import { FORTUNES } from "@/data/fortunes";
+import { getDateKey, getDateLabel, getShortDate } from "@/lib/daily";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +17,6 @@ export const metadata: Metadata = {
 
 export default function Home() {
   const now = new Date();
-  const fortune = getDailyFortune(now);
   const dateKey = getDateKey(now);
   const dateLabel = getDateLabel(now);
   const shortDate = getShortDate(now);
@@ -35,7 +30,7 @@ export default function Home() {
       <SiteHeader />
       <main id="top">
         <FortuneExperience
-          fortune={fortune}
+          fortunes={FORTUNES}
           dateKey={dateKey}
           dateLabel={dateLabel}
           shortDate={shortDate}
