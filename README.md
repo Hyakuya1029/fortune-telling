@@ -77,14 +77,11 @@ src/
 ## 部署到 Vercel
 
 1. 在 GitHub 新建仓库，例如 `fortune-telling`。
-2. 在项目目录初始化并推送：
+2. 项目已经初始化本地 Git 仓库并提交。只需关联远程仓库并推送：
 
 ```bash
-git init
-git add .
-git commit -m "feat: initial stellar oracle"
-git branch -M main
 git remote add origin https://github.com/<你的用户名>/fortune-telling.git
+git branch -M main
 git push -u origin main
 ```
 
